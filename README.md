@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Shell Script](https://img.shields.io/badge/Shell-Script-green.svg)](https://www.gnu.org/software/bash/)
 
-Un script open source pour identifier les fonctions AWS Lambda utilisant des runtimes obsolètes ou bientôt obsolètes dans vos comptes AWS.
+Un script pour identifier les fonctions AWS Lambda utilisant des runtimes obsolètes ou bientôt obsolètes dans vos comptes AWS.
 
 ## 📋 Contexte
 
@@ -126,11 +126,6 @@ Le script scanne les régions suivantes (configurables dans le script) :
 - `us-east-1` (US East - N. Virginia)
 - `us-west-2` (US West - Oregon)
 
-## ⚠️ Calendrier de Fin de Support Python 3.9
-
-- **15 décembre 2025** : Fin des mises à jour de sécurité, plus de support technique, retrait de la console AWS
-- **15 janvier 2026** : Impossible de créer de nouvelles fonctions avec Python 3.9
-- **15 février 2026** : Impossible de mettre à jour les fonctions existantes avec Python 3.9
 
 ## 🔧 Personnalisation
 
