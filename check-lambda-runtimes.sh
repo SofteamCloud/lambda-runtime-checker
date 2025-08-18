@@ -4,7 +4,7 @@
 # Copyright (c) 2024 Softeam
 # Licensed under the MIT License - see LICENSE file for details
 #
-# Script pour identifier les fonctions Lambda avec des runtimes obsolètes
+# Script to identify Lambda functions with obsolete runtimes
 # Usage: ./check-lambda-runtimes.sh [python|nodejs|all]
 
 set -euo pipefail
@@ -14,12 +14,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUTPUT_DIR="${SCRIPT_DIR}/reports"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
-# Profils à ignorer (utilisés uniquement pour SSO ou autres usages non-Lambda)
+# Profiles to ignore (used only for SSO or other non-Lambda purposes)
 IGNORED_PROFILES=(
     "login"
 )
 
-# Régions à traiter (basées sur les régions gouvernées de l'organisation)
+# Regions to process (based on organization's governed regions)
 regions=(
     "eu-north-1"      # Europe (Stockholm)
     "eu-west-3"       # Europe (Paris)
@@ -30,7 +30,7 @@ regions=(
     "us-west-2"       # US West (Oregon)
 )
 
-# Fonction pour obtenir le statut d'un runtime obsolète
+# Function to get obsolete runtime status
 get_runtime_status() {
     local runtime="$1"
     
@@ -53,7 +53,7 @@ get_runtime_status() {
     esac
 }
 
-# Fonction pour vérifier si un runtime est obsolète
+# Function to check if a runtime is obsolete
 is_runtime_obsolete() {
     local runtime="$1"
     local status
@@ -61,35 +61,35 @@ is_runtime_obsolete() {
     [[ -n "$status" ]]
 }
 
-# Couleurs pour l'affichage
+# Colors for display
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Fonction d'aide
+# Help function
 show_help() {
     cat << EOF
 Usage: $0 [OPTION]
 
 Options:
-    python      Rechercher uniquement les runtimes Python obsolètes
-    nodejs      Rechercher uniquement les runtimes Node.js obsolètes
-    all         Rechercher tous les runtimes obsolètes (défaut)
-    -h, --help  Afficher cette aide
+    python      Search only for obsolete Python runtimes
+    nodejs      Search only for obsolete Node.js runtimes
+    all         Search for all obsolete runtimes (default)
+    -h, --help  Show this help
 
-Exemples:
-    $0              # Rechercher tous les runtimes obsolètes
-    $0 python       # Rechercher uniquement Python
-    $0 nodejs       # Rechercher uniquement Node.js
+Examples:
+    $0              # Search for all obsolete runtimes
+    $0 python       # Search only for Python
+    $0 nodejs       # Search only for Node.js
 
-Le script génère un rapport dans le dossier reports/ avec les détails des fonctions trouvées.
+The script generates a report in the reports/ folder with details of found functions.
 
-Note: Certains profils sont automatiquement ignorés (configurés dans IGNORED_PROFILES).
-Actuellement ignorés: ${IGNORED_PROFILES[*]}
+Note: Some profiles are automatically ignored (configured in IGNORED_PROFILES).
+Currently ignored: ${IGNORED_PROFILES[*]}
 
-Runtimes obsolètes surveillés:
+Monitored obsolete runtimes:
     Python:
     - python3.8: EOL - Upgrade to python3.12 or python3.13
     - python3.9: EOL December 15, 2025 - Upgrade to python3.12 or python3.13
@@ -100,36 +100,36 @@ Runtimes obsolètes surveillés:
 EOF
 }
 
-# Fonction pour créer le répertoire de sortie
+# Function to create output directory
 create_output_dir() {
     mkdir -p "$OUTPUT_DIR"
-    echo -e "${GREEN}Répertoire de sortie créé: $OUTPUT_DIR${NC}"
+    echo -e "${GREEN}Output directory created: $OUTPUT_DIR${NC}"
 }
 
-# Fonction pour obtenir la liste des profils AWS
+# Function to get AWS profiles list
 get_aws_profiles() {
     aws configure list-profiles 2>/dev/null || {
-        echo -e "${RED}Erreur: Impossible de lister les profils AWS${NC}"
-        echo "Vérifiez que AWS CLI est installé et configuré"
+        echo -e "${RED}Error: Unable to list AWS profiles${NC}"
+        echo "Check that AWS CLI is installed and configured"
         exit 1
     }
 }
 
-# Fonction pour vérifier si un profil doit être ignoré
+# Function to check if a profile should be ignored
 should_ignore_profile() {
     local profile="$1"
     local ignored_profile
     
     for ignored_profile in "${IGNORED_PROFILES[@]}"; do
         if [[ "$profile" == "$ignored_profile" ]]; then
-            return 0  # true - ignorer ce profil
+            return 0  # true - ignore this profile
         fi
     done
     
-    return 1  # false - ne pas ignorer ce profil
+    return 1  # false - do not ignore this profile
 }
 
-# Fonction pour vérifier si un runtime correspond au filtre
+# Function to check if a runtime matches the filter
 runtime_matches_filter() {
     local runtime="$1"
     local filter="$2"
@@ -150,7 +150,7 @@ runtime_matches_filter() {
     esac
 }
 
-# Fonction pour scanner les fonctions Lambda
+# Function to scan Lambda functions
 scan_lambda_functions() {
     local profile="$1"
     local region="$2"
@@ -159,24 +159,24 @@ scan_lambda_functions() {
     
     echo -e "${BLUE}Scanning profile: $profile, region: $region${NC}"
     
-    # Vérifier si le profil existe et est accessible
+    # Check if profile exists and is accessible
     if ! aws sts get-caller-identity --profile "$profile" --region "$region" &>/dev/null; then
-        echo -e "${YELLOW}⚠️  Profil $profile inaccessible dans la région $region${NC}"
+        echo -e "${YELLOW}⚠️  Profile $profile inaccessible in region $region${NC}"
         return 0
     fi
     
-    # Obtenir l'ID du compte
+    # Get account ID
     local account_id
     account_id=$(aws sts get-caller-identity --profile "$profile" --region "$region" --query 'Account' --output text 2>/dev/null || echo "Unknown")
     
-    # Lister toutes les fonctions Lambda
+    # List all Lambda functions
     local functions
     functions=$(aws lambda list-functions \
         --profile "$profile" \
         --region "$region" \
         --output json 2>/dev/null || echo '{"Functions":[]}')
     
-    # Traiter chaque fonction
+    # Process each function
     echo "$functions" | jq -r '.Functions[] | @base64' | while IFS= read -r function_data; do
         local function_info
         function_info=$(echo "$function_data" | base64 --decode)
@@ -187,12 +187,12 @@ scan_lambda_functions() {
         function_arn=$(echo "$function_info" | jq -r '.FunctionArn')
         last_modified=$(echo "$function_info" | jq -r '.LastModified')
         
-        # Vérifier si le runtime correspond au filtre et est obsolète
+        # Check if runtime matches filter and is obsolete
         if runtime_matches_filter "$runtime" "$filter" && is_runtime_obsolete "$runtime"; then
             local status
             status=$(get_runtime_status "$runtime")
             
-            # Écrire dans le fichier de sortie
+            # Write to output file
             {
                 echo "FUNCTION_FOUND"
                 echo "Account: $account_id"
@@ -206,16 +206,16 @@ scan_lambda_functions() {
                 echo "---"
             } >> "$output_file"
             
-            echo -e "${RED}🔍 Trouvé: $function_name ($runtime) - $status${NC}"
+            echo -e "${RED}🔍 Found: $function_name ($runtime) - $status${NC}"
         fi
     done
 }
 
-# Fonction principale
+# Main function
 main() {
     local filter="${1:-all}"
     
-    # Vérifier les paramètres
+    # Check parameters
     case "$filter" in
         "-h"|"--help")
             show_help
@@ -224,31 +224,31 @@ main() {
         "python"|"nodejs"|"all")
             ;;
         *)
-            echo -e "${RED}Erreur: Paramètre invalide '$filter'${NC}"
+            echo -e "${RED}Error: Invalid parameter '$filter'${NC}"
             show_help
             exit 1
             ;;
     esac
     
-    echo -e "${GREEN}=== Scan des fonctions Lambda avec runtimes obsolètes ===${NC}"
-    echo -e "${BLUE}Filtre: $filter${NC}"
+    echo -e "${GREEN}=== Lambda Functions Scan for Obsolete Runtimes ===${NC}"
+    echo -e "${BLUE}Filter: $filter${NC}"
     echo -e "${BLUE}Timestamp: $TIMESTAMP${NC}"
     echo ""
     
-    # Créer le répertoire de sortie
+    # Create output directory
     create_output_dir
     
-    # Fichiers de sortie
+    # Output files
     local detailed_report="$OUTPUT_DIR/lambda_obsolete_runtimes_${filter}_${TIMESTAMP}.txt"
     local csv_report="$OUTPUT_DIR/lambda_obsolete_runtimes_${filter}_${TIMESTAMP}.csv"
     local summary_report="$OUTPUT_DIR/summary_${filter}_${TIMESTAMP}.txt"
     
-    # Initialiser les fichiers de rapport
+    # Initialize report files
     {
-        echo "# Rapport des fonctions Lambda avec runtimes obsolètes"
-        echo "# Généré le: $(date)"
-        echo "# Filtre appliqué: $filter"
-        echo "# Régions scannées: ${regions[*]}"
+        echo "# Lambda Functions Report with Obsolete Runtimes"
+        echo "# Generated on: $(date)"
+        echo "# Applied filter: $filter"
+        echo "# Scanned regions: ${regions[*]}"
         echo ""
     } > "$detailed_report"
     
@@ -256,31 +256,31 @@ main() {
         echo "Account,Profile,Region,Function,Runtime,Status,ARN,LastModified"
     } > "$csv_report"
     
-    # Obtenir la liste des profils
+    # Get profiles list
     local profiles
     profiles=$(get_aws_profiles)
     
     if [[ -z "$profiles" ]]; then
-        echo -e "${RED}Aucun profil AWS trouvé${NC}"
+        echo -e "${RED}No AWS profiles found${NC}"
         exit 1
     fi
     
-    echo -e "${GREEN}Profils AWS détectés:${NC}"
+    echo -e "${GREEN}Detected AWS profiles:${NC}"
     echo "$profiles" | sed 's/^/  - /'
     echo ""
     
-    # Variables pour le résumé
+    # Variables for summary
     local total_functions=0
     local total_accounts=0
     local account_functions=0
     
-    # Scanner chaque profil et région
+    # Scan each profile and region
     while IFS= read -r profile; do
         [[ -z "$profile" ]] && continue
         
-        # Vérifier si le profil doit être ignoré
+        # Check if profile should be ignored
         if should_ignore_profile "$profile"; then
-            echo -e "${YELLOW}⏭️  Profil '$profile' ignoré (configuré comme profil à ignorer)${NC}"
+            echo -e "${YELLOW}⏭️  Profile '$profile' ignored (configured as profile to ignore)${NC}"
             continue
         fi
         
@@ -291,7 +291,7 @@ main() {
             local temp_file=$(mktemp)
             scan_lambda_functions "$profile" "$region" "$filter" "$temp_file"
             
-            # Compter les fonctions trouvées et les ajouter aux rapports
+            # Count found functions and add to reports
             local region_functions=0
             while IFS= read -r line; do
                 if [[ "$line" == "FUNCTION_FOUND" ]]; then
@@ -299,7 +299,7 @@ main() {
                     ((account_functions++))
                     ((total_functions++))
                     
-                    # Lire les détails de la fonction
+                    # Read function details
                     local account profile_name region_name function_name runtime status arn last_modified
                     read -r account
                     read -r profile_name
@@ -310,7 +310,7 @@ main() {
                     read -r arn
                     read -r last_modified
                     
-                    # Nettoyer les valeurs
+                    # Clean values
                     account=${account#"Account: "}
                     profile_name=${profile_name#"Profile: "}
                     region_name=${region_name#"Region: "}
@@ -320,7 +320,7 @@ main() {
                     arn=${arn#"ARN: "}
                     last_modified=${last_modified#"Last Modified: "}
                     
-                    # Ajouter au rapport détaillé
+                    # Add to detailed report
                     {
                         echo "Account: $account"
                         echo "Profile: $profile_name"
@@ -333,7 +333,7 @@ main() {
                         echo ""
                     } >> "$detailed_report"
                     
-                    # Ajouter au CSV
+                    # Add to CSV
                     echo "\"$account\",\"$profile_name\",\"$region_name\",\"$function_name\",\"$runtime\",\"$status\",\"$arn\",\"$last_modified\"" >> "$csv_report"
                 fi
             done < "$temp_file"
@@ -348,20 +348,20 @@ main() {
         echo ""
     done <<< "$profiles"
     
-    # Générer le résumé
+    # Generate summary
     {
-        echo "=== RÉSUMÉ DU SCAN ==="
+        echo "=== SCAN SUMMARY ==="
         echo "Date: $(date)"
-        echo "Filtre appliqué: $filter"
-        echo "Régions scannées: ${regions[*]}"
-        echo "Profils ignorés: ${IGNORED_PROFILES[*]}"
+        echo "Applied filter: $filter"
+        echo "Scanned regions: ${regions[*]}"
+        echo "Ignored profiles: ${IGNORED_PROFILES[*]}"
         echo ""
-        echo "RÉSULTATS:"
-        echo "- Total des fonctions avec runtimes obsolètes: $total_functions"
-        echo "- Nombre de comptes impactés: $total_accounts"
+        echo "RESULTS:"
+        echo "- Total functions with obsolete runtimes: $total_functions"
+        echo "- Number of impacted accounts: $total_accounts"
         echo ""
         
-        echo "RUNTIMES OBSOLÈTES RECHERCHÉS:"
+        echo "SEARCHED OBSOLETE RUNTIMES:"
         if [[ "$filter" == "python" || "$filter" == "all" ]]; then
             echo "- python3.8: $(get_runtime_status "python3.8")"
             echo "- python3.9: $(get_runtime_status "python3.9")"
@@ -372,25 +372,25 @@ main() {
         fi
         echo ""
         
-        echo "FICHIERS GÉNÉRÉS:"
-        echo "- Rapport détaillé: $detailed_report"
-        echo "- Rapport CSV: $csv_report"
-        echo "- Résumé: $summary_report"
+        echo "GENERATED FILES:"
+        echo "- Detailed report: $detailed_report"
+        echo "- CSV report: $csv_report"
+        echo "- Summary: $summary_report"
     } > "$summary_report"
     
-    # Afficher le résumé
-    echo -e "${GREEN}=== RÉSUMÉ FINAL ===${NC}"
+    # Display summary
+    echo -e "${GREEN}=== FINAL SUMMARY ===${NC}"
     cat "$summary_report"
     
     if [[ $total_functions -gt 0 ]]; then
-        echo -e "${YELLOW}⚠️  $total_functions fonction(s) Lambda avec des runtimes obsolètes trouvée(s)${NC}"
-        echo -e "${BLUE}📋 Consultez les rapports dans: $OUTPUT_DIR${NC}"
+        echo -e "${YELLOW}⚠️  $total_functions Lambda function(s) with obsolete runtimes found${NC}"
+        echo -e "${BLUE}📋 Check reports in: $OUTPUT_DIR${NC}"
     else
-        echo -e "${GREEN}✅ Aucune fonction Lambda avec runtime obsolète trouvée${NC}"
+        echo -e "${GREEN}✅ No Lambda functions with obsolete runtimes found${NC}"
     fi
 }
 
-# Vérifier les dépendances
+# Check dependencies
 check_dependencies() {
     local missing_deps=()
     
@@ -403,15 +403,15 @@ check_dependencies() {
     fi
     
     if [[ ${#missing_deps[@]} -gt 0 ]]; then
-        echo -e "${RED}Erreur: Dépendances manquantes: ${missing_deps[*]}${NC}"
-        echo "Installez les dépendances manquantes:"
+        echo -e "${RED}Error: Missing dependencies: ${missing_deps[*]}${NC}"
+        echo "Install missing dependencies:"
         for dep in "${missing_deps[@]}"; do
             case "$dep" in
                 "aws-cli")
                     echo "  - AWS CLI: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html"
                     ;;
                 "jq")
-                    echo "  - jq: brew install jq (macOS) ou apt-get install jq (Ubuntu)"
+                    echo "  - jq: brew install jq (macOS) or apt-get install jq (Ubuntu)"
                     ;;
             esac
         done
@@ -419,7 +419,7 @@ check_dependencies() {
     fi
 }
 
-# Point d'entrée
+# Entry point
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     check_dependencies
     main "$@"

@@ -1,148 +1,148 @@
-# Guide de Contribution
+# Contributing Guide
 
-Merci de votre intérêt pour contribuer au projet AWS Lambda Runtime Checker ! 🎉
+Thank you for your interest in contributing to the AWS Lambda Runtime Checker project! 🎉
 
-## 🤝 Comment contribuer
+## 🤝 How to Contribute
 
-### Signaler un bug
+### Report a Bug
 
-1. Vérifiez que le bug n'a pas déjà été signalé dans les [Issues](../../issues)
-2. Créez une nouvelle issue avec le template "Bug Report"
-3. Incluez autant de détails que possible :
-   - Version du script
-   - Système d'exploitation
-   - Version d'AWS CLI
-   - Messages d'erreur complets
-   - Étapes pour reproduire le problème
+1. Check that the bug hasn't already been reported in [Issues](../../issues)
+2. Create a new issue with the "Bug Report" template
+3. Include as much detail as possible:
+   - Script version
+   - Operating system
+   - AWS CLI version
+   - Complete error messages
+   - Steps to reproduce the issue
 
-### Proposer une amélioration
+### Propose an Enhancement
 
-1. Créez une issue avec le template "Feature Request"
-2. Décrivez clairement la fonctionnalité souhaitée
-3. Expliquez pourquoi cette fonctionnalité serait utile
-4. Proposez une implémentation si possible
+1. Create an issue with the "Feature Request" template
+2. Clearly describe the desired functionality
+3. Explain why this feature would be useful
+4. Propose an implementation if possible
 
-### Soumettre du code
+### Submit Code
 
-1. **Fork** le repository
-2. **Clone** votre fork localement
-3. Créez une **branche** pour votre fonctionnalité :
+1. **Fork** the repository
+2. **Clone** your fork locally
+3. Create a **branch** for your feature:
    ```bash
-   git checkout -b feature/ma-nouvelle-fonctionnalite
+   git checkout -b feature/my-new-feature
    ```
-4. **Développez** votre fonctionnalité
-5. **Testez** vos modifications :
+4. **Develop** your feature
+5. **Test** your changes:
    ```bash
    ./test-setup.sh
    ```
-6. **Committez** vos changements :
+6. **Commit** your changes:
    ```bash
-   git commit -m "feat: ajouter support pour runtime XYZ"
+   git commit -m "feat: add support for runtime XYZ"
    ```
-7. **Push** vers votre fork :
+7. **Push** to your fork:
    ```bash
-   git push origin feature/ma-nouvelle-fonctionnalite
+   git push origin feature/my-new-feature
    ```
-8. Créez une **Pull Request**
+8. Create a **Pull Request**
 
-## 📝 Standards de code
+## 📝 Code Standards
 
-### Style de code
+### Code Style
 
-- Utilisez des **noms de variables explicites**
-- **Commentez** le code complexe
-- Suivez les **conventions bash** existantes
-- Utilisez des **couleurs** pour les messages utilisateur
-- Gérez les **erreurs** proprement
+- Use **explicit variable names**
+- **Comment** complex code
+- Follow existing **bash conventions**
+- Use **colors** for user messages
+- Handle **errors** properly
 
-### Messages de commit
+### Commit Messages
 
-Utilisez le format [Conventional Commits](https://www.conventionalcommits.org/) :
+Use the [Conventional Commits](https://www.conventionalcommits.org/) format:
 
-- `feat:` pour une nouvelle fonctionnalité
-- `fix:` pour une correction de bug
-- `docs:` pour la documentation
-- `style:` pour le formatage
-- `refactor:` pour la refactorisation
-- `test:` pour les tests
-- `chore:` pour les tâches de maintenance
+- `feat:` for a new feature
+- `fix:` for a bug fix
+- `docs:` for documentation
+- `style:` for formatting
+- `refactor:` for refactoring
+- `test:` for tests
+- `chore:` for maintenance tasks
 
-Exemples :
+Examples:
 ```
-feat: ajouter support pour runtime nodejs22.x
-fix: corriger l'analyse des profils avec espaces
-docs: mettre à jour le README avec nouveaux exemples
+feat: add support for nodejs22.x runtime
+fix: correct profile parsing with spaces
+docs: update README with new examples
 ```
 
-### Tests
+### Testing
 
-- Testez sur **macOS** et **Linux** si possible
-- Vérifiez que `./test-setup.sh` passe
-- Testez avec différents profils AWS
-- Vérifiez que les rapports sont générés correctement
+- Test on **macOS** and **Linux** if possible
+- Verify that `./test-setup.sh` passes
+- Test with different AWS profiles
+- Check that reports are generated correctly
 
-## 🔧 Configuration de développement
+## 🔧 Development Setup
 
-### Prérequis
+### Prerequisites
 
-- bash 3.x ou supérieur
-- AWS CLI configuré
-- jq installé
+- bash 3.x or higher
+- AWS CLI configured
+- jq installed
 - Git
 
 ### Installation
 
 ```bash
-git clone https://github.com/votre-username/lambda-runtime-checker.git
+git clone https://github.com/your-username/lambda-runtime-checker.git
 cd lambda-runtime-checker
 chmod +x *.sh
 ./test-setup.sh
 ```
 
-### Structure du projet
+### Project Structure
 
 ```
 lambda-runtime-checker/
-├── check-lambda-runtimes.sh    # Script principal
-├── test-setup.sh               # Tests d'installation
+├── check-lambda-runtimes.sh    # Main script
+├── test-setup.sh               # Installation tests
 ├── README.md                   # Documentation
-├── CONTRIBUTING.md             # Ce fichier
-├── LICENSE                     # Licence MIT
-├── .gitignore                  # Fichiers à ignorer
-└── reports/                    # Rapports générés
-    └── .gitkeep               # Maintient la structure
+├── CONTRIBUTING.md             # This file
+├── LICENSE                     # MIT License
+├── .gitignore                  # Files to ignore
+└── reports/                    # Generated reports
+    └── .gitkeep               # Maintains structure
 ```
 
 ## 🐛 Debugging
 
-### Activer le mode debug
+### Enable debug mode
 
 ```bash
-# Ajouter en haut du script
-set -x  # Affiche les commandes exécutées
+# Add at the top of the script
+set -x  # Shows executed commands
 ```
 
-### Logs utiles
+### Useful logs
 
-- Vérifiez les permissions des fichiers
-- Testez avec un seul profil AWS d'abord
-- Utilisez `aws sts get-caller-identity` pour tester l'accès
+- Check file permissions
+- Test with a single AWS profile first
+- Use `aws sts get-caller-identity` to test access
 
-## 📋 Checklist avant PR
+## 📋 PR Checklist
 
-- [ ] Le code suit les standards du projet
-- [ ] Les tests passent (`./test-setup.sh`)
-- [ ] La documentation est mise à jour
-- [ ] Les messages de commit suivent les conventions
-- [ ] Pas de données sensibles dans le code
-- [ ] Le `.gitignore` est respecté
+- [ ] Code follows project standards
+- [ ] Tests pass (`./test-setup.sh`)
+- [ ] Documentation is updated
+- [ ] Commit messages follow conventions
+- [ ] No sensitive data in code
+- [ ] `.gitignore` is respected
 
-## 🆘 Besoin d'aide ?
+## 🆘 Need Help?
 
-- Consultez les [Issues existantes](../../issues)
-- Créez une nouvelle issue avec le tag "question"
-- Contactez les mainteneurs
+- Check [existing Issues](../../issues)
+- Create a new issue with the "question" tag
+- Contact maintainers
 
-## 🙏 Merci !
+## 🙏 Thank You!
 
-Chaque contribution, petite ou grande, est appréciée. Merci de rendre ce projet meilleur ! ❤️
+Every contribution, big or small, is appreciated. Thank you for making this project better! ❤️

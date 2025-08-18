@@ -4,140 +4,140 @@
 # Copyright (c) 2024 Softeam
 # Licensed under the MIT License - see LICENSE file for details
 #
-# Script de test pour vérifier l'installation et la configuration
+# Test script to verify installation and configuration
 # Usage: ./test-setup.sh
 
 set -euo pipefail
 
-# Couleurs pour l'affichage
+# Colors for display
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}=== Test de l'installation des scripts Lambda Runtime Checker ===${NC}"
+echo -e "${GREEN}=== AWS Lambda Runtime Checker Installation Test ===${NC}"
 echo ""
 
-# Test 1: Vérifier les dépendances
-echo -e "${BLUE}1. Vérification des dépendances...${NC}"
+# Test 1: Check dependencies
+echo -e "${BLUE}1. Checking dependencies...${NC}"
 
 if command -v aws &> /dev/null; then
-    echo -e "${GREEN}✅ AWS CLI installé: $(aws --version)${NC}"
+    echo -e "${GREEN}✅ AWS CLI installed: $(aws --version)${NC}"
 else
-    echo -e "${RED}❌ AWS CLI non installé${NC}"
+    echo -e "${RED}❌ AWS CLI not installed${NC}"
     exit 1
 fi
 
 if command -v jq &> /dev/null; then
-    echo -e "${GREEN}✅ jq installé: $(jq --version)${NC}"
+    echo -e "${GREEN}✅ jq installed: $(jq --version)${NC}"
 else
-    echo -e "${RED}❌ jq non installé${NC}"
+    echo -e "${RED}❌ jq not installed${NC}"
     echo -e "${YELLOW}Installation: brew install jq${NC}"
     exit 1
 fi
 
 echo ""
 
-# Test 2: Vérifier les profils AWS
-echo -e "${BLUE}2. Vérification des profils AWS...${NC}"
+# Test 2: Check AWS profiles
+echo -e "${BLUE}2. Checking AWS profiles...${NC}"
 
 if aws configure list-profiles &> /dev/null; then
     profiles=$(aws configure list-profiles)
-    echo -e "${GREEN}✅ Profils AWS détectés:${NC}"
+    echo -e "${GREEN}✅ AWS profiles detected:${NC}"
     echo "$profiles" | sed 's/^/  - /'
 else
-    echo -e "${RED}❌ Aucun profil AWS configuré${NC}"
-    echo -e "${YELLOW}Configurez vos profils avec: aws configure --profile <nom-profil>${NC}"
+    echo -e "${RED}❌ No AWS profiles configured${NC}"
+    echo -e "${YELLOW}Configure your profiles with: aws configure --profile <profile-name>${NC}"
     exit 1
 fi
 
 echo ""
 
-# Test 3: Vérifier le script
-echo -e "${BLUE}3. Vérification du script...${NC}"
+# Test 3: Check script
+echo -e "${BLUE}3. Checking script...${NC}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 script="check-lambda-runtimes.sh"
 
 if [[ -f "$SCRIPT_DIR/$script" && -x "$SCRIPT_DIR/$script" ]]; then
-    echo -e "${GREEN}✅ $script (exécutable)${NC}"
+    echo -e "${GREEN}✅ $script (executable)${NC}"
 elif [[ -f "$SCRIPT_DIR/$script" ]]; then
-    echo -e "${YELLOW}⚠️  $script (non exécutable)${NC}"
+    echo -e "${YELLOW}⚠️  $script (not executable)${NC}"
     chmod +x "$SCRIPT_DIR/$script"
-    echo -e "${GREEN}✅ Permissions corrigées${NC}"
+    echo -e "${GREEN}✅ Permissions fixed${NC}"
 else
-    echo -e "${RED}❌ $script manquant${NC}"
+    echo -e "${RED}❌ $script missing${NC}"
     exit 1
 fi
 
 echo ""
 
-# Test 4: Test de connectivité AWS
-echo -e "${BLUE}4. Test de connectivité AWS...${NC}"
+# Test 4: Test AWS connectivity
+echo -e "${BLUE}4. Testing AWS connectivity...${NC}"
 
-# Tester avec le premier profil disponible
-first_profile=$(aws configure list-profiles | head -n 2)
+# Test with first available profile
+first_profile=$(aws configure list-profiles | head -n 1)
 
 if [[ -n "$first_profile" ]]; then
-    echo -e "${BLUE}Test avec le profil: $first_profile${NC}"
+    echo -e "${BLUE}Testing with profile: $first_profile${NC}"
     
     if aws sts get-caller-identity --profile "$first_profile" &> /dev/null; then
         account_id=$(aws sts get-caller-identity --profile "$first_profile" --query 'Account' --output text)
-        echo -e "${GREEN}✅ Connexion réussie - Compte: $account_id${NC}"
+        echo -e "${GREEN}✅ Connection successful - Account: $account_id${NC}"
     else
-        echo -e "${YELLOW}⚠️  Impossible de se connecter avec le profil $first_profile${NC}"
-        echo -e "${YELLOW}Vérifiez vos credentials AWS${NC}"
+        echo -e "${YELLOW}⚠️  Unable to connect with profile $first_profile${NC}"
+        echo -e "${YELLOW}Check your AWS credentials${NC}"
     fi
 else
-    echo -e "${RED}❌ Aucun profil disponible pour le test${NC}"
+    echo -e "${RED}❌ No profile available for testing${NC}"
 fi
 
 echo ""
 
-# Test 5: Test du script avec --help
-echo -e "${BLUE}5. Test du script (aide)...${NC}"
+# Test 5: Test script with --help
+echo -e "${BLUE}5. Testing script (help)...${NC}"
 
 if "$SCRIPT_DIR/check-lambda-runtimes.sh" --help &> /dev/null; then
-    echo -e "${GREEN}✅ check-lambda-runtimes.sh --help fonctionne${NC}"
+    echo -e "${GREEN}✅ check-lambda-runtimes.sh --help works${NC}"
 else
-    echo -e "${RED}❌ check-lambda-runtimes.sh --help échoue${NC}"
+    echo -e "${RED}❌ check-lambda-runtimes.sh --help fails${NC}"
 fi
 
 echo ""
 
-# Test 6: Vérifier la structure des dossiers
-echo -e "${BLUE}6. Vérification de la structure...${NC}"
+# Test 6: Check structure
+echo -e "${BLUE}6. Checking structure...${NC}"
 
 if [[ -f "$SCRIPT_DIR/README.md" ]]; then
-    echo -e "${GREEN}✅ Documentation README.md présente${NC}"
+    echo -e "${GREEN}✅ README.md documentation present${NC}"
 else
-    echo -e "${YELLOW}⚠️  README.md manquant${NC}"
+    echo -e "${YELLOW}⚠️  README.md missing${NC}"
 fi
 
 if [[ -d "$SCRIPT_DIR/reports" ]]; then
-    echo -e "${GREEN}✅ Dossier reports/ existe${NC}"
+    echo -e "${GREEN}✅ reports/ folder exists${NC}"
 else
-    echo -e "${BLUE}ℹ️  Dossier reports/ sera créé automatiquement${NC}"
+    echo -e "${BLUE}ℹ️  reports/ folder will be created automatically${NC}"
 fi
 
 echo ""
 
-# Résumé et instructions
-echo -e "${GREEN}=== Installation vérifiée avec succès! ===${NC}"
+# Summary and instructions
+echo -e "${GREEN}=== Installation verified successfully! ===${NC}"
 echo ""
-echo -e "${BLUE}Prochaines étapes:${NC}"
-echo -e "${YELLOW}1. Scanner vos fonctions Lambda Python:${NC}"
+echo -e "${BLUE}Next steps:${NC}"
+echo -e "${YELLOW}1. Scan your Python Lambda functions:${NC}"
 echo "   ./check-lambda-runtimes.sh python"
 echo ""
-echo -e "${YELLOW}2. Scanner vos fonctions Lambda Node.js:${NC}"
+echo -e "${YELLOW}2. Scan your Node.js Lambda functions:${NC}"
 echo "   ./check-lambda-runtimes.sh nodejs"
 echo ""
-echo -e "${YELLOW}3. Scanner tous les runtimes obsolètes:${NC}"
+echo -e "${YELLOW}3. Scan all obsolete runtimes:${NC}"
 echo "   ./check-lambda-runtimes.sh all"
 echo ""
-echo -e "${YELLOW}4. Consulter les rapports générés:${NC}"
+echo -e "${YELLOW}4. Check generated reports:${NC}"
 echo "   ls -la reports/"
 echo ""
-echo -e "${GREEN}📚 Consultez le README.md pour plus d'informations${NC}"
+echo -e "${GREEN}📚 Check README.md for more information${NC}"
