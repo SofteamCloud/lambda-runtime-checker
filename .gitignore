@@ -1,0 +1,21 @@
+# Dossier des rapports générés automatiquement
+reports/*
+!reports/.gitkeep
+
+# Fichiers temporaires
+*.tmp
+.DS_Store
+
+# Logs
+*.log
+
+# Fichiers de sauvegarde
+*.bak
+*~
+
+# Fichiers de configuration locaux (si ajoutés plus tard)
+config.local
+*.local
+
+# Fichiers CSV temporaires
+*.csv.tmp
