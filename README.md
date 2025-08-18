@@ -266,7 +266,7 @@ Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de 
 
 ## 👥 Auteurs
 
-- **Softeam** - *Développement initial* - [Softeam](https://github.com/softeam)
+- **Softeam** - *Développement initial* - [Softeam](https://github.com/SofteamCloud)
 
 ## 🙏 Remerciements
 
@@ -276,4 +276,4 @@ Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de 
 
 ---
 
-**Développé avec ❤️ par [Softeam](https://softeam.fr)**
+**Développé avec ❤️ par [Softeam](https://softeam.com)**
