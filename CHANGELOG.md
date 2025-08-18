@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2024-08-18
+
+### Added
+- Complete English translation of all documentation
+- English script messages and help text
+- International badges and references in README
+- Enhanced accessibility for global open source community
+
+### Changed
+- All French text translated to English
+- Script output messages now in English
+- Help text and error messages in English
+- Documentation structure improved for international audience
+
+### Maintained
+- All existing functionality preserved
+- Same command-line interface
+- Identical report generation capabilities
+- Same configuration options
+
 ## [1.0.0] - 2024-08-18
 
 ### Added
