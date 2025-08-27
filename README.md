@@ -22,7 +22,7 @@ AWS announced the end of support for Python 3.9 on December 15, 2025, following 
 
 ```bash
 # Clone the repository
-git clone https://github.com/softeam/lambda-runtime-checker.git
+git clone https://github.com/SofteamCloud/lambda-runtime-checker.git
 cd lambda-runtime-checker
 
 # Make scripts executable
